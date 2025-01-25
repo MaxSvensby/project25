@@ -1,0 +1,98 @@
+:root {
+    /* Primärfärger */
+    --accent-teal: #4CAF93;
+    --accent-petroleum: #264653;
+  
+    /* Bakgrundsfärger */
+    --bg-dark-gray: #1A1A1A;
+    --bg-graphite: #2E2E2E;
+    --bg-light-gray: #3C3C3C;
+  
+    /* Textfärger */
+    --text-white: #F5F5F5;
+    --text-light-gray: #CCCCCC;
+    --text-muted-blue: #A8DADC;
+  
+    /* Gränssnittselement */
+    --warning-orange: #E76F51;
+    --success-lime: #81C784;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background-color: #121212;
+    color: #ffffff;
+    font-family: 'Orbitron', sans-serif; /* Använd Orbitron för hela sidan */
+}
+
+h1, h2, nav a {
+    font-family: 'Righteous', sans-serif; /* Använd Righteous för rubriker och menyer */
+}
+
+#nav_logo{
+    width:5vw;
+    height: 5vw;
+    background-image: url('/img/2.png');
+    background-size: cover; /* Gör bilden så stor att den täcker hela bakgrunden */
+    background-position: center; /* Centrerar bilden */
+    background-repeat: no-repeat; /* Förhindrar att bilden upprepas */
+    transition: all 0.3s ease-in-out;
+}
+
+#nav_logo:hover{
+    filter: hue-rotate(50deg);
+}
+
+/* Navigation styling */
+nav {
+    display: flex;
+    align-items: center;
+    justify-content: left;
+    /*padding: 10px 20px;*/
+    background-color: #1f1f1f;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+    position: sticky;
+    top: 0;
+}
+
+.nav-links a {
+    text-decoration: none;
+    color: #ffffff;
+    font-size: 1vw;
+    transition: color 1s ease-in-out; /* Transition the text color */
+}
+
+.nav-links {
+    display: flex;
+    align-items: center;
+    width: 20vw;
+    justify-content: space-around;
+}
+
+.symbols{
+    width:1.5vw;
+    height: 1.5vw;
+    /* background-image: url('/img/inventory.png'); */
+    background-size: cover; /* Gör bilden så stor att den täcker hela bakgrunden */
+    background-position: center; /* Centrerar bilden */
+    background-repeat: no-repeat; /* Förhindrar att bilden upprepas */
+    opacity: 1;
+}
+
+.link_holder {
+    display: flex;
+    align-items: center;
+}
+
+.link_holder:hover #case{
+    filter: invert(70%) sepia(54%) saturate(1462%) hue-rotate(360deg) brightness(103%) contrast(105%);
+}
+
+.link_holder:hover #back{
+    filter: invert(34%) sepia(98%) saturate(3575%) hue-rotate(200deg) brightness(103%) contrast(105%);
+}
+
+.link_holder:hover #create{
+    filter: invert(46%) sepia(16%) saturate(7061%) hue-rotate(106deg) brightness(100%) contrast(69%);
+}
