@@ -18,6 +18,23 @@
     --success-lime: #81C784;
 }
 
+#login_button {
+    background-color: var(--accent-petroleum);
+    border:#121212;
+    color: white;
+    padding: 0.8vw 1.6vw;
+    text-decoration: none;
+    margin: 0.2vw 1.6vw;
+    cursor: pointer;
+    border-radius: 5px;
+    border: 2px solid var(--accent-petroleum); /* Green */
+    font-family: 'Righteous', sans-serif;
+}
+
+#login_button:hover{
+    background-color: #172a31;
+}
+
 body {
     margin: 0;
     background-color: #121212;
@@ -44,15 +61,22 @@ h1, h2, nav a {
 }
 
 /* Navigation styling */
-nav {
+#nav_holder {
     display: flex;
     align-items: center;
     justify-content: left;
     /*padding: 10px 20px;*/
+}
+
+nav {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
     background-color: #1f1f1f;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
     position: sticky;
     top: 0;
+    justify-content: space-between;
 }
 
 .nav-links a {
@@ -95,3 +119,4 @@ nav {
 .link_holder:hover #create{
     filter: invert(46%) sepia(16%) saturate(7061%) hue-rotate(106deg) brightness(100%) contrast(69%);
 }
+

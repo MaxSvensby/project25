@@ -10,18 +10,19 @@ html lang="en"
   body
     
     nav
-        a id="nav_logo" alt="blue emblem" href="/"
-        div class="nav-links"
-            a class="link_holder" href="/"
-                img id="case" class="symbols" src="img/case.png"
-                p Cases
-            a class="link_holder" href="/inventory"
-                img id="back" class="symbols" src="img/inventory.png"
-                p Inventory
-            a class="link_holder" href="/create"
-                img id="create" class="symbols" src="img/create.png"
-                p Create
+        div id="nav_holder"
+            a id="nav_logo" alt="blue emblem" href="/"
+            div class="nav-links"
+                a class="link_holder" href="/"
+                    img id="case" class="symbols" src="img/case.png"
+                    p Cases
+                a class="link_holder" href="/inventory"
+                    img id="back" class="symbols" src="img/inventory.png"
+                    p Inventory
+                a class="link_holder" href="/create"
+                    img id="create" class="symbols" src="img/create.png"
+                    p Create
         form action="loginpage" method="get"
-          input type="submit" value="Login"
+          input type="submit" value="Login" id="login_button"
 
     ==yield

@@ -63,3 +63,12 @@ end
 get ('/create') do
     slim(:create)
 end
+
+post ('/case/new') do
+    case_name = params[:case_name]
+    case_color = params[:case_color]
+    case_price = params[:case_price]
+
+    db = SQLite3::Database.new('db/csgo.db')
+    db.execute('INSERT INTO cases (name, price, color) VALUES (?,?,?)', [case_name,case_price,case_color])
+end
