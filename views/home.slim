@@ -1,2 +1,9 @@
 -if session[:id]
     p #{session[:id]}
+
+ol
+    - cases.each do |c|
+        li 
+            a href="case/open/#{c['id']}"
+                h2 = c['name']
+                p = c['price']

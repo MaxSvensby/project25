@@ -17,7 +17,13 @@ def connect_db()
 end
 
 get ('/') do
-    slim(:home)
+    db = connect_db()
+
+    result = db.execute("SELECT * FROM cases")
+
+    p result
+
+    slim(:"home", locals:{cases:result})
 end
 
 get ('/loginpage') do
@@ -45,14 +51,18 @@ post ('/login') do
     username = params[:username]
     password = params[:password]
     db = connect_db()
-    result = db.execute("SELECT * FROM users WHERE username = ?", username).first
-    pwdigest = result["pwdigest"]
-    id = result["id"]
-    if BCrypt::Password.new(pwdigest) == password
-        session[:id] = id
-        redirect('/')
+    result = db.execute("SELECT * FROM users WHERE username = ?", [username]).first
+    if result.nil?
+        "User not found"
     else
-        "FEL LÖSENORD"
+        pwdigest = result["pwdigest"]
+        id = result["id"]
+        if BCrypt::Password.new(pwdigest) == password
+            session[:id] = id
+            redirect('/')
+        else
+            "FEL LÖSENORD"
+        end
     end
 end
 
@@ -71,4 +81,6 @@ post ('/case/new') do
 
     db = SQLite3::Database.new('db/csgo.db')
     db.execute('INSERT INTO cases (name, price, color) VALUES (?,?,?)', [case_name,case_price,case_color])
+
+    redirect('/create')
 end
