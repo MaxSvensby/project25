@@ -21,8 +21,6 @@ get ('/') do
 
     result = db.execute("SELECT * FROM cases")
 
-    p result
-
     slim(:"home", locals:{cases:result})
 end
 
@@ -83,4 +81,13 @@ post ('/case/new') do
     db.execute('INSERT INTO cases (name, price, color) VALUES (?,?,?)', [case_name,case_price,case_color])
 
     redirect('/create')
+end
+
+get ('/case/open/:id') do
+    id = params[:id].to_i
+
+    db = connect_db()
+    result = db.execute("SELECT * FROM cases WHERE id = ?", [id]).first
+
+    slim(:cases_open,locals:{result:result})
 end
