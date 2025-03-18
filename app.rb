@@ -121,9 +121,10 @@ post ('/case/new') do
 
     db.execute('INSERT INTO cases (name, price, color) VALUES (?,?,?)', [case_name,case_price,case_color])
     case_id = db.execute('SELECT id FROM cases').last
-    #adding_items.each do |item|
-        #item_id = db.execute('SELECT id FROM items WHERE name = ?', [item.lowercase])
-        #db.execute('INSERT INTO case_item (case_id, item_id) VALUES (?,?)', [case_id, item_id])
+    adding_items.each do |item|
+        item_id = db.execute('SELECT id FROM items WHERE name = ?', [item])
+        db.execute('INSERT INTO case_item (case_id, item_id) VALUES (?,?)', [case_id, item_id])
+    end
     adding_items = nil
     redirect('/create')
 end
@@ -134,5 +135,26 @@ get ('/case/open/:id') do
     db = connect_db()
     result = db.execute("SELECT * FROM cases WHERE id = ?", [id]).first
 
-    slim(:cases_open,locals:{result:result})
+    db = SQLite3::Database.new('db/csgo.db')
+
+    ids = db.execute("SELECT item_id FROM case_item WHERE case_id = ?", [id])
+    new_ids = []
+    i = 0
+    while i < ids.length
+        new_ids << ids[i][0]
+        i += 1
+    end
+    placeholders = new_ids.join(", ")
+    items = db.execute("SELECT * FROM items WHERE id IN (#{placeholders})")
+    slim(:cases_open,locals:{result:result, items:items})
+end
+
+def add_items()
+
+    db = connect_db()
+
+    Dir.glob("public/img/skins/inferno_2018/*").each do |image|
+        filename = File.basename(image, ".*")
+        db.execute('INSERT INTO items (name,rarity,value,wear,image) VALUES (?,?,?,?,?)', [filename, "common", 1, 0.5, "image"])
+    end
 end

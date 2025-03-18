@@ -1,19 +1,19 @@
 link rel="stylesheet" href="/css/opening.css"
-script src="https://cdn.jsdelivr.net/npm/gsap@3.12.7/dist/gsap.min.js"
+script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"
 
 h2 = result['name']
 
-div class="wrapper"
-    div class="box"1
-    div class="box"2
-    div class="box"3
-    div class="box"4
-    div class="box"5
-    div class="box"6
-    div class="box"7
-    div class="box"8
-    div class="box"9
+div class="raffle-roller"
+	div class="raffle-roller-holder"
+		div class="raffle-roller-container" style="margin-left: 0px;"
 
-button class="next" next
+button onclick="generate(1);"go
 
+p = items
+
+script id="apa"
+    |
+        var weapons = "#{items}"; 
+        console.log(weapons);
+    
 script src="/js/opening.js"

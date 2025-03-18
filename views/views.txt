@@ -1,1 +1,11 @@
 I denna mapp: slimfiler och mappar för dem.
+
+//var items_json = '<%= items %>';
+    console.log(items);
+    / var items = !{items_json};
+    / var weapons = items.map(item => {
+    /     return {
+    /         skin: item[1],
+    /         img: "/img/skins/mirage_2021/" + item[1] + ".png"
+    /     }
+    / })
