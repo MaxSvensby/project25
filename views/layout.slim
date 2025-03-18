@@ -22,7 +22,11 @@ html lang="en"
                 a class="link_holder" href="/create"
                     img id="create" class="symbols" src="/img/create.png"
                     p Create
-        form action="loginpage" method="get"
-          input type="submit" value="Login" id="login_button"
+        - if session[:id]
+          form action="logout" method="post"
+            input type="submit" value="Logout" id="login_button"
+        - else
+          form action="loginpage" method="get"
+            input type="submit" value="Login" id="login_button"
 
     ==yield

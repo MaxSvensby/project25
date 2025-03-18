@@ -61,7 +61,7 @@ function horizontalLoop(items, config) {
   }
   function toIndex(index, vars) {
     vars = vars || {};
-    (Math.abs(index - curIndex) > length / 2) && (index += index > curIndex ? -length : length); // always go in the shortest direction
+    //(Math.abs(index - curIndex) > length / 2) && (index += index > curIndex ? -length : length); // always go in the shortest direction
     let newIndex = gsap.utils.wrap(0, length, index),
       time = times[newIndex];
     if (time > tl.time() !== index > curIndex) { // if we're wrapping the timeline's playhead, make the proper adjustments
@@ -72,7 +72,7 @@ function horizontalLoop(items, config) {
     vars.overwrite = true;
     return tl.tweenTo(time, vars);
   }
-  tl.next = vars => toIndex(curIndex+1, vars);
+  tl.next = vars => toIndex(curIndex+ (Math.floor(Math.random() * 9) + 1), vars);
   tl.previous = vars => toIndex(curIndex-1, vars);
   tl.current = () => curIndex;
   tl.toIndex = (index, vars) => toIndex(index, vars);

@@ -1,5 +1,39 @@
-form action="/case/new" method="post" 
-    input type="text" name="case_name" placeholder="Case Name"
-    input type="color" name="case_color"
-    input type="text" name="case_price" placeholder="Price $"
-    input type="submit" value="Create Case"
+- if item_selected 
+
+    form action="/case/new" method="post" 
+        input type="text" name="case_name" placeholder="Case Name"
+        input type="color" name="case_color"
+        input type="text" name="case_price" placeholder="Price $"
+        input type="submit" value="Create Case"
+- else
+    form action="/item_select" method="post"
+        h3 Inferno 2018
+        select name="inferno"
+            option value="none"
+            -Dir.glob("public/img/skins/inferno_2018/*").each do |item|
+                - filename = File.basename(item, ".*")
+                option value="#{filename}" = filename
+
+        h3 Mirage 2021
+        select name="mirage" 
+            option value="none"
+            -Dir.glob("public/img/skins/mirage_2021/*").each do |item|
+                - filename = File.basename(item, ".*")
+                option value="#{filename}" = filename
+        
+        input type="submit" value="Add Item"
+
+h2 Items:
+
+- adding_items.each do |item|
+    p = item
+
+- if !item_selected
+    form action="/item_confirm" method="post" 
+        input type="submit" value="Confirm Selected Items"
+
+    form action="/item_reset" method="post"
+        input type="submit" value="Reset"
+- else 
+    form action="create" method="get" 
+        input type="submit" value="Back"
