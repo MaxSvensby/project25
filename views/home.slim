@@ -1,9 +1,10 @@
 -if session[:id]
     p #{session[:id]}
 
-ol
+div class="wrapper"
+
     - cases.each do |c|
-        li 
-            a href="case/open/#{c['id']}"
-                h2 = c['name']
-                p = c['price']
+        a href="case/open/#{c['id']}" class="cases"
+            h2 = c['name']
+            p = c['price']
+            img src="/img/case_base.png"

@@ -1,19 +1,20 @@
 link rel="stylesheet" href="/css/opening.css"
 script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"
 
-h2 = result['name']
+div class="wrapper"
+    h2 = result['name']
 
-div class="raffle-roller"
-	div class="raffle-roller-holder"
-		div class="raffle-roller-container" style="margin-left: 0px;"
+    div class="raffle-roller"
+        div class="raffle-roller-holder"
+            div class="raffle-roller-container" style="margin-left: 0px;"
 
-button onclick="generate(1);"go
+    button onclick="generate(1);"go
 
-p = items
+    p = items
 
-script id="apa"
-    |
-        var weapons = "#{items}"; 
-        console.log(weapons);
-    
-script src="/js/opening.js"
+    script id="apa"
+        |
+            var weapons = "#{items}"; 
+            console.log(weapons);
+        
+    script src="/js/opening.js"
