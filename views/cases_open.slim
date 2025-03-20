@@ -8,12 +8,10 @@ div class="wrapper"
         div class="raffle-roller-holder"
             div class="raffle-roller-container" style="margin-left: 0px;"
 
-    button onclick="generate(1);"go
-    -p items.to_json
-    p = items
-    / "#{items}"; 
-    script id="apa"
+    button id="roll_case" go
+
+    script
         | 
-            var weapons = "#{items}";
+            var weapons_arr = "#{items}";
         
     script src="/js/opening.js"

@@ -13,6 +13,7 @@
             -Dir.glob("public/img/skins/inferno_2018/*").each do |item|
                 - filename = File.basename(item, ".*")
                 option value="#{filename}" = filename
+        input type="number" name="amount_inferno" placeholder="Amount"
 
         h3 Mirage 2021
         select name="mirage" 
@@ -20,7 +21,8 @@
             -Dir.glob("public/img/skins/mirage_2021/*").each do |item|
                 - filename = File.basename(item, ".*")
                 option value="#{filename}" = filename
-        
+        input type="number" name="amount_mirage" placeholder="Amount"
+        br
         input type="submit" value="Add Item"
 
 h2 Items:

@@ -3,6 +3,7 @@ require 'slim'
 require 'sqlite3'
 require 'sinatra/reloader'
 require 'bcrypt'
+require 'json'
 
 enable:sessions
 
@@ -79,7 +80,8 @@ get ('/create') do
         adding_items = []
     end
     if params[:add_item]
-        adding_items << params[:add_item]
+        parsed_item = JSON.parse(params[:add_item])
+        adding_items << parsed_item
     end
 
     slim(:create, locals:{adding_items: adding_items, item_selected: params[:item_selected]})
@@ -88,11 +90,13 @@ end
 post ('/item_select') do
     inferno_item = params[:inferno]
     mirage_item = params[:mirage]
+    amount_mirage = params[:amount_mirage]
+    amount_inferno = params[:amount_inferno]
 
     if inferno_item == "none" && mirage_item != "none"
-        add_item = mirage_item
+        add_item = [mirage_item, amount_mirage]
     elsif mirage_item == "none" && inferno_item != "none"
-        add_item = inferno_item
+        add_item = [inferno_item, amount_inferno]
     end
 
     redirect "/create?add_item=#{add_item}" if add_item
@@ -121,9 +125,11 @@ post ('/case/new') do
 
     db.execute('INSERT INTO cases (name, price, color) VALUES (?,?,?)', [case_name,case_price,case_color])
     case_id = db.execute('SELECT id FROM cases').last
+    p adding_items
     adding_items.each do |item|
-        item_id = db.execute('SELECT id FROM items WHERE name = ?', [item])
-        db.execute('INSERT INTO case_item (case_id, item_id) VALUES (?,?)', [case_id, item_id])
+        p item[0]
+        item_id = db.execute('SELECT id FROM items WHERE name = ?', [item[0]])
+        db.execute('INSERT INTO case_item (case_id, item_id, amount) VALUES (?,?,?)', [case_id, item_id, item[1]])
     end
     adding_items = nil
     redirect('/create')
@@ -153,8 +159,8 @@ def add_items()
 
     db = connect_db()
 
-    Dir.glob("public/img/skins/inferno_2018/*").each do |image|
+    Dir.glob("public/img/skins/mirage_2021/*").each do |image|
         filename = File.basename(image, ".*")
-        db.execute('INSERT INTO items (name,rarity,value,wear,image) VALUES (?,?,?,?,?)', [filename, "common", 1, 0.5, "image"])
+        db.execute('INSERT INTO items (name,rarity,value,wear,image,collection) VALUES (?,?,?,?,?,?)', [filename, "common", 1, 0.5, "image","mirage_2021"])
     end
 end
