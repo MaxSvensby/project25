@@ -12,8 +12,15 @@ var items = {
 		img: "https://steamcdn-a.akamaihd.net/apps/730/icons/econ/default_generated/weapon_m4a1_cu_m4_asimov_light_large.af03179f3d43ff55b0c3d114c537eac77abdb6cf.png"
 	}
 };
+weapons = weapons.replace(/&quot;/g, '"');
+try {
+	weapons = JSON.parse(weapons); // Convert it into a proper JavaScript array
+} catch (e) {
+	console.error("Error parsing JSON:", e);
+}
 
 function generate(ng) {
+	console.log(weapons)
 	$('.raffle-roller-container').css({
 		transition: "sdf",
 		"margin-left": "0px"
@@ -40,10 +47,10 @@ function goRoll(skin, skinimg) {
 		"background-image": "url("+skinimg+")"
 	});
 	setTimeout(function() {
-		$('#CardNumber78').addClass('winning-item');
+		$('#CardNumber79').addClass('winning-item');
 		$('#rolled').html(skin);
 	}, 8500);
-	$('.raffle-roller-container').css('margin-left', '-6770px');
+	$('.raffle-roller-container').css('margin-left', '-425rem'); //-425rem as math.random, (423,427)
 }
 function randomInt(min, max) {
   return Math.floor(Math.random() * (max - min)) + min;
