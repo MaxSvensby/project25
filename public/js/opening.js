@@ -59,7 +59,7 @@ function generate(ng) {
 	
 	setTimeout(function() {
 		var rand = randomInt(40,100);
-    	goRoll(rand, weapons[rand % weapons.length][1], '/img/skins/'+ weapons[rand % weapons.length][6] +'/'+weapons[rand % weapons.length][1]+'.png')
+    	goRoll(rand, weapons[rand % weapons.length], '/img/skins/'+ weapons[rand % weapons.length][6] +'/'+weapons[rand % weapons.length][1]+'.png')
 	}, 500);
 }
 function goRoll(rand, skin, skinimg) {
@@ -72,10 +72,34 @@ function goRoll(rand, skin, skinimg) {
 	});
 	setTimeout(function() {
 		$('#CardNumber'+rand).addClass('winning-item');
-		$('#rolled').html(skin);
+		$('#rolled').html(skin[1]);
+		sendClass(skin)
 	}, 8500);
 	$('.raffle-roller-container').css('margin-left', '-'+ (rand-4) * 5.75 +'rem'); //-425rem as math.random, (423,427)
 }
 function randomInt(min, max) {
   return Math.floor(Math.random() * (max - min)) + min;
+}
+
+function sendClass(win_skin) {
+	document.getElementById("popup-img").src = '/img/skins/'+ win_skin[6] +'/'+win_skin[1]+'.png';
+	document.getElementById("popup-item-name").innerText = win_skin[1];
+
+	document.getElementById("popup-overlay").classList.add("show");
+	document.querySelector(".popup").classList.add("show");
+
+    fetch('/get_class', {
+        method: 'post',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: 'class_name=' + [win_skin]
+    }).then(response => response.text()).then(data => {
+        console.log(data);
+    });
+}
+
+document.getElementById("close-btn").addEventListener("click", () => {closePopup()});
+
+function closePopup() {
+	document.getElementById("popup-overlay").classList.remove("show");
+	document.querySelector(".popup").classList.remove("show");
 }

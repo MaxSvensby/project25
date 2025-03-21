@@ -125,9 +125,7 @@ post ('/case/new') do
 
     db.execute('INSERT INTO cases (name, price, color) VALUES (?,?,?)', [case_name,case_price,case_color])
     case_id = db.execute('SELECT id FROM cases').last
-    p adding_items
     adding_items.each do |item|
-        p item[0]
         item_id = db.execute('SELECT id FROM items WHERE name = ?', [item[0]])
         db.execute('INSERT INTO case_item (case_id, item_id, amount) VALUES (?,?,?)', [case_id, item_id, item[1]])
     end
@@ -144,6 +142,7 @@ get ('/case/open/:id') do
     db = SQLite3::Database.new('db/csgo.db')
 
     ids = db.execute("SELECT item_id FROM case_item WHERE case_id = ?", [id])
+    amount = db.execute("SELECT amount FROM case_item WHERE case_id = ?", [id])
     new_ids = []
     i = 0
     while i < ids.length
@@ -151,8 +150,24 @@ get ('/case/open/:id') do
         i += 1
     end
     placeholders = new_ids.join(", ")
-    items = db.execute("SELECT * FROM items WHERE id IN (#{placeholders})")
+    items = db.execute("SELECT * FROM items WHERE id IN (#{placeholders})").map(&:dup)
+    items.each_with_index do |item, index|
+        item << amount[index][0]
+    end
     slim(:cases_open,locals:{result:result, items:items})
+end
+
+post ('/get_class') do
+    class_name = params[:class_name]
+    skin = class_name.split(',')
+    skin[0] = skin[0].to_i    # Convert "29" to integer 29
+    skin[3] = skin[3].to_f    # Convert "1" to float 1
+    skin[4] = skin[4].to_f    # Convert "0.5" to float 0.5
+    skin[7] = skin[7].to_i    # Convert "2" to integer 2
+
+    db = SQLite3::Database.new('db/csgo.db')
+    item_id = skin[0]
+    db.execute('INSERT INTO user_item (user_id, item_id) VALUES (?,?)', [session[:id], item_id])
 end
 
 def add_items()
