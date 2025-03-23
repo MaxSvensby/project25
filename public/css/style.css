@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,100..900;1,100..900&display=swap');
+
 :root {
     /* Primärfärger */
     --accent-teal: #4CAF93;
@@ -135,6 +137,15 @@ nav {
     color: white;
     list-style: none;
     margin: 0;
+    background-color: rgba(129, 199, 132, 0.4);
+    width: 40%;
+    text-align: center;
+    font-family: "Noto Sans", sans-serif;
+    font-weight: 400;
+    font-size: larger;
+    outline: #81C784 solid 0.2rem;
+    position: relative;
+    top: -0.7rem;
 }
 
 .cases h2 {
@@ -142,6 +153,13 @@ nav {
     color: white;
     list-style: none;
     margin: 0;
+    top: 0.8rem;
+    position:relative;
+}
+
+.cases img {
+    height: 75%;
+    width:fit-content;
 }
 
 .case_list_item {
@@ -155,8 +173,8 @@ nav {
     flex-direction: column;
     color: white;
     list-style: none;
-    background-color: rgba(229, 124, 142,1);
     width: 16rem;
-    height: 10rem;
+    height: 14rem;
     margin: 2rem;
+    align-items: center;
 }

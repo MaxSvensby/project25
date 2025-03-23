@@ -6,5 +6,5 @@ div class="wrapper"
     - cases.each do |c|
         a href="case/open/#{c['id']}" class="cases"
             h2 = c['name']
-            p = c['price']
             img src="/img/case_base.png"
+            p = "$ #{c['price']}"
