@@ -1,7 +1,8 @@
 div class="wrapper"
     - if items != nil
         - items.each do |item|
-            div class="item_inventory"
-                h2 = item['name']
-                img src="/img/case_base.png"
-                a = "$ #{item['value']}"
+            - for x in 1..item["amount"] do
+                div class="item_inventory"
+                    h2 = item['name']
+                    img src="/img/case_base.png"
+                    a = "$ #{item['value']}"

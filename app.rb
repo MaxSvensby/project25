@@ -83,7 +83,20 @@ get ('/inventory') do
             i += 1
         end
         placeholders = new_ids.join(", ")
-        items = db.execute("SELECT * FROM items WHERE id IN (#{placeholders})")
+        p placeholders
+        items = db.execute("SELECT * FROM items WHERE id IN (#{placeholders})").map(&:dup)
+        items.each_with_index do |item, index|
+            i = 0
+            amount = 0
+            while i < new_ids.length 
+                if item["id"] == new_ids[i]
+                    amount += 1
+                end
+                i+=1
+            end
+            item["amount"] = amount
+        end
+        p items
     else
         items = nil
     end
