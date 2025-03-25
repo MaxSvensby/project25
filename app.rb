@@ -71,7 +71,23 @@ post ('/logout') do
 end
 
 get ('/inventory') do
-    slim(:inventory)
+    if session[:id] != nil
+        db = connect_db()
+
+        item_ids = db.execute('SELECT item_id FROM user_item WHERE user_id = ?', [session[:id]])
+        array = item_ids.map(&:values).flatten
+        new_ids = []
+        i = 0
+        while i < array.length
+            new_ids << array[i]
+            i += 1
+        end
+        placeholders = new_ids.join(", ")
+        items = db.execute("SELECT * FROM items WHERE id IN (#{placeholders})")
+    else
+        items = nil
+    end
+    slim(:inventory, locals:{items:items})
 end
 
 adding_items = nil
