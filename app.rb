@@ -96,7 +96,6 @@ get ('/inventory') do
             end
             item["amount"] = amount
         end
-        p items
     else
         items = nil
     end
