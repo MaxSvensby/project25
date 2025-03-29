@@ -2,8 +2,11 @@ div class="wrapper"
     - if items != nil
         - items.each do |item|
             - for x in 1..item["amount"] do
-                div class="item_inventory"
+                div class="item_inventory #{item['rarity']}"
                     h2 = item['name']
                     img src="/img/skins/#{item["collection"]}/#{item["name"]}.png"
-                    form action="skin/sell" method="post"
-                        input type="submit" class="sell_button" value="Sell $#{item['value']}"
+                    div class="item_price_sell"
+                        span class="item_price"$#{item['value']}
+                        form action="skin/sell" method="post"
+                            input type="hidden" name="item_id" value="#{item['id']}"
+                            input type="submit" class="sell_button" value="Sell"

@@ -83,18 +83,10 @@ get ('/inventory') do
             i += 1
         end
         placeholders = new_ids.join(", ")
-        p placeholders
         items = db.execute("SELECT * FROM items WHERE id IN (#{placeholders})").map(&:dup)
         items.each_with_index do |item, index|
-            i = 0
-            amount = 0
-            while i < new_ids.length 
-                if item["id"] == new_ids[i]
-                    amount += 1
-                end
-                i+=1
-            end
-            item["amount"] = amount
+            amount = db.execute('SELECT amount FROM user_item WHERE user_id = ? AND item_id = ?', [session[:id], item["id"]])
+            item["amount"] = amount[0]["amount"]
         end
     else
         items = nil
@@ -193,14 +185,29 @@ post ('/get_class') do
     skin[4] = skin[4].to_f    # Convert "0.5" to float 0.5
     skin[7] = skin[7].to_i    # Convert "2" to integer 2
 
-    db = SQLite3::Database.new('db/csgo.db')
+    db = connect_db()
     item_id = skin[0]
-    db.execute('INSERT INTO user_item (user_id, item_id) VALUES (?,?)', [session[:id], item_id])
+    result = db.execute('SELECT * FROM user_item WHERE user_id = ? AND item_id = ?', [session[:id], item_id])
+    db = SQLite3::Database.new('db/csgo.db')
+    if result != []
+        db.execute('UPDATE user_item SET amount = ? WHERE user_id = ? AND item_id = ?', [result[0]["amount"] + 1, session[:id], item_id])
+    else
+        db.execute('INSERT INTO user_item (user_id, item_id, amount) VALUES (?,?,?)', [session[:id], item_id, 1])
+    end
 end
 
 post ('/skin/sell') do
 
+    item_id = params[:item_id].to_i
+    user_id = session[:id].to_i
 
+    db = SQLite3::Database.new('db/csgo.db')
+    amount = db.execute('SELECT amount FROM user_item WHERE item_id = ? AND user_id = ?', [item_id, user_id])
+    if amount[0][0] > 1
+        db.execute('UPDATE user_item SET amount = ? WHERE user_id = ? AND item_id = ?', [amount[0][0] - 1, user_id, item_id])
+    else
+        db.execute('DELETE FROM user_item WHERE item_id = ? AND user_id = ?', [item_id, user_id])
+    end
 
     redirect('/inventory')
 end
