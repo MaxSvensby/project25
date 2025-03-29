@@ -4,5 +4,6 @@ div class="wrapper"
             - for x in 1..item["amount"] do
                 div class="item_inventory"
                     h2 = item['name']
-                    img src="/img/case_base.png"
-                    a = "$ #{item['value']}"
+                    img src="/img/skins/#{item["collection"]}/#{item["name"]}.png"
+                    form action="skin/sell" method="post"
+                        input type="submit" class="sell_button" value="Sell $#{item['value']}"

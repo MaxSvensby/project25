@@ -198,6 +198,13 @@ post ('/get_class') do
     db.execute('INSERT INTO user_item (user_id, item_id) VALUES (?,?)', [session[:id], item_id])
 end
 
+post ('/skin/sell') do
+
+
+
+    redirect('/inventory')
+end
+
 def add_items()
 
     db = connect_db()
