@@ -7,6 +7,5 @@ div class="wrapper"
                     img src="/img/skins/#{item["collection"]}/#{item["name"]}.png"
                     div class="item_price_sell"
                         span class="item_price"$#{item['value']}
-                        form action="skin/sell" method="post"
-                            input type="hidden" name="item_id" value="#{item['id']}"
+                        form action="skin/#{item['id']}/sell" method="post"
                             input type="submit" class="sell_button" value="Sell"

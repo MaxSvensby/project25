@@ -29,4 +29,7 @@ html lang="en"
           form action="loginpage" method="get"
             input type="submit" value="Login" id="login_button"
 
+    - if flash[:notice]
+      p.notice = flash[:notice] 
     ==yield
+    script src="js/main.js"

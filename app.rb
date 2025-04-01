@@ -4,24 +4,22 @@ require 'sqlite3'
 require 'sinatra/reloader'
 require 'bcrypt'
 require 'json'
+require 'sinatra/flash'
+require_relative './model/model.rb'
 
 enable:sessions
 
-before do
-    p "Körs innan alla routes, kolla om man är inloggad"
-end
-
-def connect_db()
-    db = SQLite3::Database.new('db/csgo.db')
-    db.results_as_hash = true
-    return db
+#Time.now
+before ('/create') do
+    result = checkAdmin(session[:id])
+    if session[:id] == nil || result[0]["admin"] == nil
+        flash[:notice] = "You need admin role to create cases!"
+        redirect('/')
+    end
 end
 
 get ('/') do
-    db = connect_db()
-
-    result = db.execute("SELECT * FROM cases")
-
+    result = getCases()
     slim(:"home", locals:{cases:result})
 end
 
@@ -38,8 +36,7 @@ post ('/register') do
     if (password == password_confirm)
         balance = 0
         password_digest = BCrypt::Password.create(password)
-        db = SQLite3::Database.new('db/csgo.db')
-        db.execute('INSERT INTO users (username,pwdigest,balance,admin) VALUES (?,?,?,?)', [username,password_digest,balance,admin])
+        addUser(username, password_digest, balance, admin)
         redirect('/')
     else
         redirect('/loginpage')
@@ -49,8 +46,7 @@ end
 post ('/login') do
     username = params[:username]
     password = params[:password]
-    db = connect_db()
-    result = db.execute("SELECT * FROM users WHERE username = ?", [username]).first
+    result = getUser(username)
     if result.nil?
         "User not found!"
     else
@@ -73,7 +69,6 @@ end
 get ('/inventory') do
     if session[:id] != nil
         db = connect_db()
-
         item_ids = db.execute('SELECT item_id FROM user_item WHERE user_id = ?', [session[:id]])
         array = item_ids.map(&:values).flatten
         new_ids = []
@@ -141,13 +136,11 @@ post ('/case/new') do
     case_color = params[:case_color]
     case_price = params[:case_price]
 
-    db = SQLite3::Database.new('db/csgo.db')
-
-    db.execute('INSERT INTO cases (name, price, color) VALUES (?,?,?)', [case_name,case_price,case_color])
-    case_id = db.execute('SELECT id FROM cases').last
+    addCase(case_name,case_price,case_color)
+    case_id = getCaseId()
     adding_items.each do |item|
-        item_id = db.execute('SELECT id FROM items WHERE name = ?', [item[0]])
-        db.execute('INSERT INTO case_item (case_id, item_id, amount) VALUES (?,?,?)', [case_id, item_id, item[1]])
+        item_id = getItemId(item)
+        addItemToCase(case_id, item_id, item)
     end
     adding_items = nil
     redirect('/create')
@@ -156,13 +149,9 @@ end
 get ('/case/open/:id') do
     id = params[:id].to_i
 
-    db = connect_db()
-    result = db.execute("SELECT * FROM cases WHERE id = ?", [id]).first
+    result = getCaseFromId(id)
 
-    db = SQLite3::Database.new('db/csgo.db')
-
-    ids = db.execute("SELECT item_id FROM case_item WHERE case_id = ?", [id])
-    amount = db.execute("SELECT amount FROM case_item WHERE case_id = ?", [id])
+    ids,amount = getIdsAmount(id)
     new_ids = []
     i = 0
     while i < ids.length
@@ -170,7 +159,7 @@ get ('/case/open/:id') do
         i += 1
     end
     placeholders = new_ids.join(", ")
-    items = db.execute("SELECT * FROM items WHERE id IN (#{placeholders})").map(&:dup)
+    items = getItemFromIds(placeholders)
     items.each_with_index do |item, index|
         item << amount[index][0]
     end
@@ -187,17 +176,15 @@ post ('/get_class') do
 
     db = connect_db()
     item_id = skin[0]
-    result = db.execute('SELECT * FROM user_item WHERE user_id = ? AND item_id = ?', [session[:id], item_id])
-    db = SQLite3::Database.new('db/csgo.db')
+    result = getAmountFromUserItem(session[:id], item_id)
     if result != []
-        db.execute('UPDATE user_item SET amount = ? WHERE user_id = ? AND item_id = ?', [result[0]["amount"] + 1, session[:id], item_id])
+        updateUserItemWithAmount(result[0]["amount"] + 1, session[:id], item_id)
     else
         db.execute('INSERT INTO user_item (user_id, item_id, amount) VALUES (?,?,?)', [session[:id], item_id, 1])
     end
 end
 
-post ('/skin/sell') do
-
+post ('/skin/:item_id/sell') do
     item_id = params[:item_id].to_i
     user_id = session[:id].to_i
 
