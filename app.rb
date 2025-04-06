@@ -161,21 +161,8 @@ get ('/case/:id') do
     id = params[:id].to_i
 
     result = getCaseFromId(id)
-
-    # ids,amount = getIdsAmount(id)
-    # new_ids = []
-    # i = 0
-    # while i < ids.length
-    #     new_ids << ids[i][0]
-    #     i += 1
-    # end
-    # placeholders = new_ids.join(", ")
-    # items = getItemFromIds(placeholders)
-    # items.each_with_index do |item, index|
-    #     item << amount[index][0]
-    # end
-    
     items = retrieveItemsFromCase(id)
+
     slim(:case_open,locals:{result:result, items:items})
 end
 
@@ -197,13 +184,10 @@ post ('/case/:id/update') do
     redirect("/")
 end
 
-post ('/get_class') do
+post ('/items') do
     class_name = params[:class_name]
     skin = class_name.split(',')
     skin[0] = skin[0].to_i    # Convert "29" to integer 29
-    skin[3] = skin[3].to_f    # Convert "1" to float 1
-    skin[4] = skin[4].to_f    # Convert "0.5" to float 0.5
-    skin[7] = skin[7].to_i    # Convert "2" to integer 2
     item_id = skin[0]
     amount = getAmountFromUserItem(session[:id], item_id)
     if amount != []

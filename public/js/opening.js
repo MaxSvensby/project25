@@ -91,7 +91,7 @@ function sendClass(win_skin) {
 	document.getElementById("popup-overlay").classList.add("show");
 	document.querySelector(".popup").classList.add("show");
 
-    fetch('/get_class', {
+    fetch('/items', {
         method: 'post',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
         body: 'class_name=' + [win_skin]
