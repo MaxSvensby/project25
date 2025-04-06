@@ -9,8 +9,6 @@ require_relative './model/model.rb'
 
 enable:sessions
 
-#Time.now
-# restful routes
 before ('/cases/new') do
     result = checkAdmin(session[:id])
     if session[:id] == nil || result[0]["admin"] == nil
