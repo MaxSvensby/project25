@@ -1,12 +1,12 @@
 - if item_selected 
 
-    form action="/case/new" method="post" 
+    form action="/cases" method="post" 
         input type="text" name="case_name" placeholder="Case Name"
         input type="color" name="case_color"
         input type="text" name="case_price" placeholder="Price $"
         input type="submit" value="Create Case"
 - else
-    form action="/item_select" method="post"
+    form action="/item/select" method="post"
         h3 Inferno 2018
         select name="inferno"
             option value="none"
@@ -31,11 +31,11 @@ h2 Items:
     p = item
 
 - if !item_selected
-    form action="/item_confirm" method="post" 
+    form action="/item/confirm" method="post" 
         input type="submit" value="Confirm Selected Items"
 
-    form action="/item_reset" method="post"
+    form action="/item/reset" method="post"
         input type="submit" value="Reset"
 - else 
-    form action="create" method="get" 
+    form action="/cases/new" method="get" 
         input type="submit" value="Back"

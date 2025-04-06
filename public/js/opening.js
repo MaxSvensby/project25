@@ -12,9 +12,12 @@
 // 		img: "https://steamcdn-a.akamaihd.net/apps/730/icons/econ/default_generated/weapon_m4a1_cu_m4_asimov_light_large.af03179f3d43ff55b0c3d114c537eac77abdb6cf.png"
 // 	}
 // };
-weapons_arr = weapons_arr.replace(/&quot;/g, '"');
+weapons_arr = weapons_arr.replace(/&quot;/g, '"').replace(/&gt;/g, '>');
+weapons_arr = weapons_arr.replace(/"=>"/g, '":"').replace(/"=>/g, '":');
+
 try {
 	weapons = JSON.parse(weapons_arr); // Convert it into a proper JavaScript array
+	
 } catch (e) {
 	console.error("Error parsing JSON:", e);
 }
@@ -25,7 +28,7 @@ for(var i = 0;i < 101; i++) {
 		skin: weapons[i][1],
 	})
 } */
-
+console.log(weapons)
 
 document.getElementById("roll_case").addEventListener("click", () => {generate(1)});
 
@@ -37,7 +40,7 @@ function generate(ng) {
 	}, 10).html('');
 	for(var i = 0;i < 111; i++) {
 		const index = i % weapons.length
-		var element = '<div id="CardNumber'+i+'" class="item" style="background-image:url(/img/skins/'+ weapons[index][6] +'/'+weapons[index][1]+'.png);"></div>';
+		var element = '<div id="CardNumber'+i+'" class="item" style="background-image:url(/img/skins/'+ weapons[index]["collection"] +'/'+weapons[index]["name"]+'.png);"></div>';
 		var randed = randomInt(1,1000);
 		/* if(randed < 50) {
 			element = '<div id="CardNumber'+i+'" class="item" style="background-image:url('+weapons.img+');"></div>';
@@ -59,7 +62,7 @@ function generate(ng) {
 	
 	setTimeout(function() {
 		var rand = randomInt(40,100);
-    	goRoll(rand, weapons[rand % weapons.length], '/img/skins/'+ weapons[rand % weapons.length][6] +'/'+weapons[rand % weapons.length][1]+'.png')
+    	goRoll(rand, weapons[rand % weapons.length], '/img/skins/'+ weapons[rand % weapons.length]["collection"] +'/'+weapons[rand % weapons.length]["name"]+'.png')
 	}, 500);
 }
 function goRoll(rand, skin, skinimg) {
@@ -82,8 +85,8 @@ function randomInt(min, max) {
 }
 
 function sendClass(win_skin) {
-	document.getElementById("popup-img").src = '/img/skins/'+ win_skin[6] +'/'+win_skin[1]+'.png';
-	document.getElementById("popup-item-name").innerText = win_skin[1];
+	document.getElementById("popup-img").src = '/img/skins/'+ win_skin["collection"] +'/'+win_skin["name"]+'.png';
+	document.getElementById("popup-item-name").innerText = win_skin["name"];
 
 	document.getElementById("popup-overlay").classList.add("show");
 	document.querySelector(".popup").classList.add("show");

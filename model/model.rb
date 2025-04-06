@@ -52,9 +52,33 @@ def getItemFromIds(placeholders)
 end
 
 def getAmountFromUserItem(id, item_id)
-    return db.execute('SELECT * FROM user_item WHERE user_id = ? AND item_id = ?', [id, item_id])
+    return connect_db().execute('SELECT amount FROM user_item WHERE user_id = ? AND item_id = ?', [id, item_id])
 end
 
 def updateUserItemWithAmount(amount, id, item_id)
-    db.execute('UPDATE user_item SET amount = ? WHERE user_id = ? AND item_id = ?', [amount, id, item_id])
+    connect_db().execute('UPDATE user_item SET amount = ? WHERE user_id = ? AND item_id = ?', [amount, id, item_id])
+end
+
+def addItemToUser(user_id, item_id, amount)
+    connect_db().execute('INSERT INTO user_item (user_id, item_id, amount) VALUES (?,?,?)', [user_id, item_id, amount])
+end
+
+def deleteItem(item_id, user_id)
+    connect_db().execute('DELETE FROM user_item WHERE item_id = ? AND user_id = ?', [item_id, user_id])
+end
+
+def addItem(filename)
+    connect_db().execute('INSERT INTO items (name,rarity,value,wear,image,collection) VALUES (?,?,?,?,?,?)', [filename, "common", 1, 0.5, "image","mirage_2021"])
+end
+
+def updateCase(id, case_name,case_price,case_color)
+    connect_db().execute('UPDATE cases SET name = ?, price = ?, color = ? WHERE id = ?', [case_name,case_price,case_color,id])
+end
+
+def retrieveItemsFromUser(id)
+    return connect_db().execute("SELECT * FROM items INNER JOIN user_item ON user_item.item_id = items.id AND user_id = ?",[id])
+end
+
+def retrieveItemsFromCase(id)
+    return connect_db().execute("SELECT * FROM items INNER JOIN case_item ON case_item.item_id = items.id AND case_id = ?", [id])
 end

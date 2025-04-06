@@ -10,7 +10,8 @@ require_relative './model/model.rb'
 enable:sessions
 
 #Time.now
-before ('/create') do
+# restful routes
+before ('/cases/new') do
     result = checkAdmin(session[:id])
     if session[:id] == nil || result[0]["admin"] == nil
         flash[:notice] = "You need admin role to create cases!"
@@ -47,16 +48,41 @@ post ('/login') do
     username = params[:username]
     password = params[:password]
     result = getUser(username)
+
+    cooldown_period = 60 # seconds
+    max_attempts = 3
+
+    # Initialize session storage
+    session[:login_attempts] ||= 0
+    session[:last_attempt_time] ||= Time.now - cooldown_period
+    
+    if session[:login_attempts] >= max_attempts
+        if Time.now - session[:last_attempt_time] < cooldown_period
+            flash[:notice] = "Too many login attempts. Please wait #{(cooldown_period - (Time.now - session[:last_attempt_time])).to_i} #{} seconds."
+            redirect('/loginpage')
+        else
+            # Cooldown has passed, reset attempts
+            session[:login_attempts] = 0
+        end
+    end
+
     if result.nil?
-        "User not found!"
+        session[:login_attempts] += 1
+        session[:last_attempt_time] = Time.now
+        flash[:notice] = "User not found!"
+        redirect('/loginpage')
     else
         pwdigest = result["pwdigest"]
         id = result["id"]
         if BCrypt::Password.new(pwdigest) == password
             session[:id] = id
+            session[:login_attempts] = 0 # Reset on success
             redirect('/')
         else
-            "WRONG PASSWORD"
+            session[:login_attempts] += 1
+            session[:last_attempt_time] = Time.now
+            flash[:notice] = "Wrong password!"
+            redirect('/loginpage')
         end
     end
 end
@@ -66,23 +92,9 @@ post ('/logout') do
     redirect('/')
 end
 
-get ('/inventory') do
+get ('/items/') do
     if session[:id] != nil
-        db = connect_db()
-        item_ids = db.execute('SELECT item_id FROM user_item WHERE user_id = ?', [session[:id]])
-        array = item_ids.map(&:values).flatten
-        new_ids = []
-        i = 0
-        while i < array.length
-            new_ids << array[i]
-            i += 1
-        end
-        placeholders = new_ids.join(", ")
-        items = db.execute("SELECT * FROM items WHERE id IN (#{placeholders})").map(&:dup)
-        items.each_with_index do |item, index|
-            amount = db.execute('SELECT amount FROM user_item WHERE user_id = ? AND item_id = ?', [session[:id], item["id"]])
-            item["amount"] = amount[0]["amount"]
-        end
+        items = retrieveItemsFromUser(session[:id])
     else
         items = nil
     end
@@ -90,7 +102,7 @@ get ('/inventory') do
 end
 
 adding_items = nil
-get ('/create') do
+get ('/cases/new') do
     if !adding_items
         adding_items = []
     end
@@ -102,7 +114,7 @@ get ('/create') do
     slim(:create, locals:{adding_items: adding_items, item_selected: params[:item_selected]})
 end
 
-post ('/item_select') do
+post ('/item/select') do
     inferno_item = params[:inferno]
     mirage_item = params[:mirage]
     amount_mirage = params[:amount_mirage]
@@ -114,56 +126,75 @@ post ('/item_select') do
         add_item = [inferno_item, amount_inferno]
     end
 
-    redirect "/create?add_item=#{add_item}" if add_item
-    redirect "/create"
+    redirect "/cases/new?add_item=#{add_item}" if add_item
+    redirect "/cases/new"
 end
 
-post ('/item_confirm') do
+post ('/item/confirm') do
     item_selected = true
 
-    redirect "/create?item_selected=#{item_selected}" if item_selected
-    redirect "/create"
+    redirect "/cases/new?item_selected=#{item_selected}" if item_selected
+    redirect "/cases/new"
 end
 
-post ('/item_reset') do
+post ('/item/reset') do
     adding_items = nil
-    redirect('/create')
+    redirect('/cases/new')
 end
 
-
-post ('/case/new') do
+post ('/cases') do
     case_name = params[:case_name]
     case_color = params[:case_color]
     case_price = params[:case_price]
 
-    addCase(case_name,case_price,case_color)
-    case_id = getCaseId()
+    addCase(case_name, case_price, case_color)
+    case_id = getCaseId()["id"].to_i
     adding_items.each do |item|
-        item_id = getItemId(item)
+        item_id = getItemId(item)[0]["id"].to_i
         addItemToCase(case_id, item_id, item)
     end
     adding_items = nil
-    redirect('/create')
+    redirect('/cases/new')
 end
 
-get ('/case/open/:id') do
+get ('/case/:id') do
     id = params[:id].to_i
 
     result = getCaseFromId(id)
 
-    ids,amount = getIdsAmount(id)
-    new_ids = []
-    i = 0
-    while i < ids.length
-        new_ids << ids[i][0]
-        i += 1
-    end
-    placeholders = new_ids.join(", ")
-    items = getItemFromIds(placeholders)
-    items.each_with_index do |item, index|
-        item << amount[index][0]
-    end
-    slim(:cases_open,locals:{result:result, items:items})
+    # ids,amount = getIdsAmount(id)
+    # new_ids = []
+    # i = 0
+    # while i < ids.length
+    #     new_ids << ids[i][0]
+    #     i += 1
+    # end
+    # placeholders = new_ids.join(", ")
+    # items = getItemFromIds(placeholders)
+    # items.each_with_index do |item, index|
+    #     item << amount[index][0]
+    # end
+    
+    items = retrieveItemsFromCase(id)
+    slim(:case_open,locals:{result:result, items:items})
+end
+
+get ('/case/:id/edit') do 
+    id = params[:id].to_i
+    case_item = getCaseFromId(id)
+
+    slim(:case_update, locals:{case_item:case_item})
+end
+
+post ('/case/:id/update') do
+    case_name = params[:case_name]
+    case_color = params[:case_color]
+    case_price = params[:case_price]
+    case_id = params[:id]
+
+    updateCase(case_id,case_name,case_price,case_color)
+
+    redirect("/")
 end
 
 post ('/get_class') do
@@ -173,38 +204,33 @@ post ('/get_class') do
     skin[3] = skin[3].to_f    # Convert "1" to float 1
     skin[4] = skin[4].to_f    # Convert "0.5" to float 0.5
     skin[7] = skin[7].to_i    # Convert "2" to integer 2
-
-    db = connect_db()
     item_id = skin[0]
-    result = getAmountFromUserItem(session[:id], item_id)
-    if result != []
-        updateUserItemWithAmount(result[0]["amount"] + 1, session[:id], item_id)
+    amount = getAmountFromUserItem(session[:id], item_id)
+    if amount != []
+        updateUserItemWithAmount(amount[0]["amount"] + 1, session[:id], item_id)
     else
-        db.execute('INSERT INTO user_item (user_id, item_id, amount) VALUES (?,?,?)', [session[:id], item_id, 1])
+        addItemToUser(session[:id], item_id, 1)
     end
 end
 
-post ('/skin/:item_id/sell') do
+post ('/items/skin/:item_id/sell') do
     item_id = params[:item_id].to_i
     user_id = session[:id].to_i
 
-    db = SQLite3::Database.new('db/csgo.db')
-    amount = db.execute('SELECT amount FROM user_item WHERE item_id = ? AND user_id = ?', [item_id, user_id])
-    if amount[0][0] > 1
-        db.execute('UPDATE user_item SET amount = ? WHERE user_id = ? AND item_id = ?', [amount[0][0] - 1, user_id, item_id])
+    amount = getAmountFromUserItem(user_id, item_id)[0]["amount"]
+    if amount > 1
+        updateUserItemWithAmount(amount - 1, user_id, item_id)
     else
-        db.execute('DELETE FROM user_item WHERE item_id = ? AND user_id = ?', [item_id, user_id])
+        deleteItem(item_id, user_id)
     end
 
-    redirect('/inventory')
+    redirect('/items/')
 end
 
 def add_items()
 
-    db = connect_db()
-
     Dir.glob("public/img/skins/mirage_2021/*").each do |image|
         filename = File.basename(image, ".*")
-        db.execute('INSERT INTO items (name,rarity,value,wear,image,collection) VALUES (?,?,?,?,?,?)', [filename, "common", 1, 0.5, "image","mirage_2021"])
+        addItem(filename)
     end
 end

@@ -1,7 +1,11 @@
 div class="wrapper"
 
     - cases.each do |c|
-        a href="case/open/#{c['id']}" class="cases"
-            h2 = c['name']
-            img src="/img/case_base.png"
-            p = "$ #{c['price']}"
+        div class="case_wrapper"
+            a href="case/#{c['id']}" class="cases"
+                h2 = c['name']
+                img src="/img/case_base.png"
+                p = "$ #{c['price']}"
+                
+            -if session[:id] != nil
+                a href="case/#{c['id']}/edit" class="case_update" = "Update"

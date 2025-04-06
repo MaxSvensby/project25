@@ -1,0 +1,5 @@
+form action="/case/#{case_item["id"]}/update" method="post" 
+    input type="text" name="case_name" value="#{case_item["name"]}"
+    input type="color" name="case_color" value="#{case_item["color"]}"
+    input type="text" name="case_price" value="#{case_item["price"]}"
+    input type="submit" value="Update Case"
