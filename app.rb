@@ -9,7 +9,8 @@ require_relative './model/model.rb'
 
 enable:sessions
 
-before ('/cases/new') do
+admin_paths = ['/cases/new', '/case/:id/edit']
+before (admin_paths) do
     result = checkAdmin(session[:id])
     if session[:id] == nil || result[0]["admin"] == nil
         flash[:notice] = "You need admin role to create cases!"
@@ -195,7 +196,7 @@ post ('/items') do
     end
 end
 
-post ('/items/skin/:item_id/sell') do
+post ('/items/skin/:item_id/delete') do
     item_id = params[:item_id].to_i
     user_id = session[:id].to_i
 
