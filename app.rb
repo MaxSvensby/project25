@@ -10,6 +10,12 @@ require_relative './model/model.rb'
 enable:sessions
 
 admin_paths = ['/cases/new', '/case/:id/edit']
+
+# Before filter to restrict access to admin-only routes
+#
+# @param [Integer] session[:id] the current user's ID
+#
+# @return [void]
 before (admin_paths) do
     result = checkAdmin(session[:id])
     if session[:id] == nil || result[0]["admin"] == nil
@@ -18,15 +24,29 @@ before (admin_paths) do
     end
 end
 
+# Displays the home page with all cases
+#
+# @return [Slim] the rendered homepage
 get ('/') do
     result = getCases()
     slim(:"index", locals:{cases:result})
 end
 
+# Renders the login and registration page
+#
+# @return [Slim]
 get ('/loginpage') do
     slim(:loginpage)
 end
 
+# Handles user registration and creates a new user if passwords match
+#
+# @param [String] username
+# @param [String] password
+# @param [String] password_confirm
+# @param [String] admin
+#
+# @return [Redirect]
 post ('/register') do
     username = params[:username]
     password = params[:password]
@@ -43,6 +63,12 @@ post ('/register') do
     end
 end
 
+# Handles user login and applies rate limiting after failed attempts
+#
+# @param [String] username
+# @param [String] password
+#
+# @return [Redirect]
 post ('/login') do
     username = params[:username]
     password = params[:password]
@@ -86,11 +112,17 @@ post ('/login') do
     end
 end
 
+# Logs out the user by clearing session
+#
+# @return [Redirect]
 post ('/logout') do
     session[:id] = nil
     redirect('/')
 end
 
+# Displays the current user's item inventory
+#
+# @return [Slim]
 get ('/items/') do
     if session[:id] != nil
         items = retrieveItemsFromUser(session[:id])
@@ -101,6 +133,10 @@ get ('/items/') do
 end
 
 adding_items = nil
+
+# Renders the case creation page with optionally added items
+#
+# @return [Slim]
 get ('/cases/new') do
     if !adding_items
         adding_items = []
@@ -113,6 +149,9 @@ get ('/cases/new') do
     slim(:create, locals:{adding_items: adding_items, item_selected: params[:item_selected]})
 end
 
+# Adds an item selection from the form to the current case-in-progress
+#
+# @return [Redirect]
 post ('/item/select') do
     inferno_item = params[:inferno]
     mirage_item = params[:mirage]
@@ -129,6 +168,9 @@ post ('/item/select') do
     redirect "/cases/new"
 end
 
+# Confirms the currently selected items for the case
+#
+# @return [Redirect]
 post ('/item/confirm') do
     item_selected = true
 
@@ -136,11 +178,17 @@ post ('/item/confirm') do
     redirect "/cases/new"
 end
 
+# Resets the currently added items during case creation
+#
+# @return [Redirect]
 post ('/item/reset') do
     adding_items = nil
     redirect('/cases/new')
 end
 
+# Finalizes case creation and adds it along with items to the database
+#
+# @return [Redirect]
 post ('/cases') do
     case_name = params[:case_name]
     case_color = params[:case_color]
@@ -156,6 +204,11 @@ post ('/cases') do
     redirect('/cases/new')
 end
 
+# Shows the details and contents of a case
+#
+# @param [Integer] id the case ID
+#
+# @return [Slim]
 get ('/case/:id') do
     id = params[:id].to_i
 
@@ -165,6 +218,11 @@ get ('/case/:id') do
     slim(:"case/index",locals:{result:result, items:items})
 end
 
+# Renders the case edit form for admins
+#
+# @param [Integer] id
+#
+# @return [Slim]
 get ('/case/:id/edit') do 
     id = params[:id].to_i
     case_item = getCaseFromId(id)
@@ -172,6 +230,12 @@ get ('/case/:id/edit') do
     slim(:"case/case_update", locals:{case_item:case_item})
 end
 
+
+# Updates a case with new data from the form
+#
+# @param [Integer] id
+#
+# @return [Redirect]
 post ('/case/:id/update') do
     case_name = params[:case_name]
     case_color = params[:case_color]
@@ -183,10 +247,15 @@ post ('/case/:id/update') do
     redirect("/")
 end
 
+# Adds an item to the current user's inventory
+#
+# @param [String] class_name the item string including ID and name
+#
+# @return [void]
 post ('/items') do
     class_name = params[:class_name]
     skin = class_name.split(',')
-    skin[0] = skin[0].to_i    # Convert "29" to integer 29
+    skin[0] = skin[0].to_i
     item_id = skin[0]
     amount = getAmountFromUserItem(session[:id], item_id)
     if amount != []
@@ -196,6 +265,11 @@ post ('/items') do
     end
 end
 
+# Removes an item from a user's inventory
+#
+# @param [Integer] item_id the ID of the item to delete
+#
+# @return [Redirect]
 post ('/items/skin/:item_id/delete') do
     item_id = params[:item_id].to_i
     user_id = session[:id].to_i
@@ -210,6 +284,10 @@ post ('/items/skin/:item_id/delete') do
     redirect('/items/')
 end
 
+
+# Adds all items found in the Mirage 2021 skin directory to the database
+#
+# @return [void]
 def add_items()
 
     Dir.glob("public/img/skins/mirage_2021/*").each do |image|
