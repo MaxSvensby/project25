@@ -20,7 +20,7 @@ end
 
 get ('/') do
     result = getCases()
-    slim(:"home", locals:{cases:result})
+    slim(:"index", locals:{cases:result})
 end
 
 get ('/loginpage') do
@@ -162,7 +162,7 @@ get ('/case/:id') do
     result = getCaseFromId(id)
     items = retrieveItemsFromCase(id)
 
-    slim(:"case/case_open",locals:{result:result, items:items})
+    slim(:"case/index",locals:{result:result, items:items})
 end
 
 get ('/case/:id/edit') do 
