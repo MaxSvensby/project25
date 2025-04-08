@@ -39,7 +39,7 @@ post ('/register') do
         addUser(username, password_digest, balance, admin)
         redirect('/')
     else
-        redirect('/loginpage')
+        redirect("/loginpage")
     end
 end
 
@@ -69,7 +69,7 @@ post ('/login') do
         session[:login_attempts] += 1
         session[:last_attempt_time] = Time.now
         flash[:notice] = "User not found!"
-        redirect('/loginpage')
+        redirect("/loginpage")
     else
         pwdigest = result["pwdigest"]
         id = result["id"]
@@ -162,14 +162,14 @@ get ('/case/:id') do
     result = getCaseFromId(id)
     items = retrieveItemsFromCase(id)
 
-    slim(:case_open,locals:{result:result, items:items})
+    slim(:"case/case_open",locals:{result:result, items:items})
 end
 
 get ('/case/:id/edit') do 
     id = params[:id].to_i
     case_item = getCaseFromId(id)
 
-    slim(:case_update, locals:{case_item:case_item})
+    slim(:"case/case_update", locals:{case_item:case_item})
 end
 
 post ('/case/:id/update') do
