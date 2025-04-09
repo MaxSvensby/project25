@@ -94,7 +94,7 @@ function sendClass(win_skin) {
     fetch('/items', {
         method: 'post',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: 'class_name=' + [win_skin]
+        body: 'class_name=' + win_skin["id"]
     }).then(response => response.text()).then(data => {
         console.log(data);
     });

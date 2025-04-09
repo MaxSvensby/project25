@@ -214,7 +214,7 @@ get ('/case/:id') do
 
     result = getCaseFromId(id)
     items = retrieveItemsFromCase(id)
-
+    
     slim(:"case/index",locals:{result:result, items:items})
 end
 
@@ -253,11 +253,9 @@ end
 #
 # @return [void]
 post ('/items') do
-    class_name = params[:class_name]
-    skin = class_name.split(',')
-    skin[0] = skin[0].to_i
-    item_id = skin[0]
+    item_id = params[:class_name].to_i
     amount = getAmountFromUserItem(session[:id], item_id)
+    
     if amount != []
         updateUserItemWithAmount(amount[0]["amount"] + 1, session[:id], item_id)
     else
