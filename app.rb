@@ -170,9 +170,18 @@ post ('/item/select') do
     amount_inferno = params[:amount_inferno]
 
     if inferno_item == "none" && mirage_item != "none"
+        if amount_mirage == ""
+            amount_mirage = "1"
+        end
         add_item = [mirage_item, amount_mirage]
     elsif mirage_item == "none" && inferno_item != "none"
+        if amount_inferno == ""
+            amount_inferno = "1"
+        end
         add_item = [inferno_item, amount_inferno]
+    else
+        flash[:notice] = "You need to select an item"
+        redirect("/cases/new")
     end
 
     redirect "/cases/new?add_item=#{add_item}" if add_item
@@ -183,6 +192,10 @@ end
 #
 # @return [Redirect]
 post ('/item/confirm') do
+    if adding_items == [] || adding_items == nil
+        flash[:notice] = "You need to add an item"
+        redirect("/cases/new")
+    end
     item_selected = true
 
     redirect "/cases/new?item_selected=#{item_selected}" if item_selected
