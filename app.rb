@@ -53,6 +53,11 @@ post ('/register') do
     password_confirm = params[:password_confirm]
     admin = params[:admin]
 
+    if username.strip.empty? || password.strip.empty? || password_confirm.strip.empty?
+        flash[:notice] = "Fill in the fields"
+        redirect('/loginpage')
+    end
+
     if (password == password_confirm)
         balance = 0
         password_digest = BCrypt::Password.create(password)
@@ -72,8 +77,14 @@ end
 post ('/login') do
     username = params[:username]
     password = params[:password]
-    result = getUser(username)
 
+    if username.strip.empty? || password.strip.empty?
+        flash[:notice] = "Fill in the fields"
+        redirect('/loginpage')
+    end
+
+    result = getUser(username)
+    
     cooldown_period = 60 # seconds
     max_attempts = 3
 
