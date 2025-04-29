@@ -43,6 +43,16 @@ def getUser(username)
     return connect_db().execute("SELECT * FROM users WHERE username = ?", [username]).first
 end
 
+def getAllUsers()
+    return connect_db().execute("SELECT * FROM users")
+end
+
+def deleteUser(id)
+    db = connect_db()
+    db.execute('DELETE FROM user_item WHERE user_id = ?', [id])
+    db.execute('DELETE FROM users WHERE id = ?', [id])
+end
+
 # Adds a new case to the database
 #
 # @param [String] case_name

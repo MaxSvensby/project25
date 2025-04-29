@@ -22,6 +22,9 @@ html lang="en"
                 a class="link_holder" href="/cases/new"
                     img id="create" class="symbols" src="/img/create.png"
                     p Create
+                a class="link_holder" href="/users/"
+                    img id="create" class="symbols" src="/img/create.png"
+                    p Users
         - if session[:id]
           form action="/logout" method="post"
             input type="submit" value="Logout" id="login_button"

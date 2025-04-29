@@ -1,0 +1,7 @@
+- users.each do |user|
+    div class="userdiv"
+        h2 #{user["username"]}
+        - if user["admin"]
+            p Admin is #{user["admin"]}
+        form action="/user/#{user["id"]}/delete" method="post"
+            input type="submit" value="delete"

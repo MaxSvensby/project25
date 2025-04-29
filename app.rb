@@ -9,7 +9,7 @@ require_relative './model/model.rb'
 
 enable:sessions
 
-admin_paths = ['/cases/new', '/case/:id/edit']
+admin_paths = ['/cases/new', '/case/:id/edit', '/users/']
 
 # Before filter to restrict access to admin-only routes
 #
@@ -141,6 +141,20 @@ get ('/items/') do
         items = nil
     end
     slim(:inventory, locals:{items:items})
+end
+
+get ('/users/') do
+    all_users = getAllUsers()
+    slim(:users, locals:{users:all_users})
+end
+
+post ('/user/:id/delete') do
+    user_id = params[:id]
+    if session[:id] == user_id.to_i
+        session[:id] = nil
+    end
+    deleteUser(user_id)
+    redirect('/users/')
 end
 
 adding_items = nil
